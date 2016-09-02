@@ -37,13 +37,26 @@ angular.module('starter', ['ionic'])
   $scope.usuario = "";
   $scope.usuario = email;
   console.log($scope.usuario);
-  
+
   var VariableFireBase = new Firebase('https://chat1-1a28d.firebaseio.com/usuarios/');
+  $scope.EnviarMensaje=function (){
+      var name = $('#nameInput').val();
+      var text = $('#messageInput').val();
+      var fecha = Firebase.ServerValue.TIMESTAMP;
+      VariableFireBase.push({usuario:name, mensaje:text, fecha_ingreso:fecha});
+  }
+  
+  
    VariableFireBase.on('child_added', function (snapshot) {
       $timeout(function(){
         var message = snapshot.val();
         $scope.misMensajes.push(message);
         console.log($scope.misMensajes);
+        var fecha = new Date(message.fecha_ingreso);
+        var hora = fecha.getHours();
+        var minutos = fecha.getMinutes();
+        $('<div/>').text(message.mensaje + '->' + hora + ':' + minutos).prepend($('<em/>').text(message.usuario+': ')).appendTo($('#messagesDiv'));
+        $('#messagesDiv')[0].scrollTop = $('#messagesDiv')[0].scrollHeight;
       });
    });
 
