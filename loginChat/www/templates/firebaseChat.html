@@ -1,0 +1,40 @@
+<div id='messagesDiv'></div>
+<input type='text' id='nameInput' placeholder='Name' value="{{usuario}}">
+<input type='text' id='messageInput' placeholder='Message...'>
+
+<div>
+<script type='text/javascript'>
+
+  // Aca ponemos la referencia a su firebase
+  var messagesRef = new Firebase('https://chat1-1a28d.firebaseio.com/usuarios/');
+
+
+  // Cuando presionen el ENTER , guardamos los datos en firebase.
+  $('#messageInput').keypress(function (e) {
+    if (e.keyCode == 13) {
+      var name = $('#nameInput').val();
+      var text = $('#messageInput').val();
+      var fecha = Firebase.ServerValue.TIMESTAMP;
+      //console.log(fecha); //devuelve un objeto que es un numero correspondiente a los milisegundos que transcurrieron desde 1900...
+      messagesRef.push({usuario:name, mensaje:text, fecha_ingreso:fecha});
+      $('#messageInput').val('');
+    }
+  });
+
+  // agregamos la funcion que funciona de callback que es disparada por cada mensaje de chat.
+  messagesRef.on('child_added', function (snapshot) {
+    var message = snapshot.val();
+    var fecha = new Date(message.fecha_ingreso);
+    console.log(fecha);
+    var hora = fecha.getHours();
+    var minutos = fecha.getMinutes();
+    
+
+    //.text(message.fecha_ingreso)
+    $('<div/>').text(message.mensaje + '->' + hora + ':' + minutos).prepend($('<em/>').text(message.usuario+': ')).appendTo($('#messagesDiv'));
+    $('#messagesDiv')[0].scrollTop = $('#messagesDiv')[0].scrollHeight;
+  });
+</script>
+
+<button ui-sref="login" class="button button-block button-assertive">Cerrar Sesion</button>
+</div>
